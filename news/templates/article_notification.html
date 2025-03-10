@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ news.title }}</title>
+</head>
+<body>
+    <h2>Здравствуй, {{ username }}!</h2>
+    <p>Новая статья в твоём любимом разделе: <strong>{{ news.title }}</strong></p>
+    <p>{{ news.content|truncatechars:50 }}</p>
+    <p><a href="{{ article_url }}">Читать полностью</a></p>
+</body>
+</html>

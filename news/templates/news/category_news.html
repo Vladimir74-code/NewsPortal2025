@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+
+{% block content %}
+<div class="container">
+    <!-- Навигационная панель -->
+    <nav class="navbar navbar-expand-lg mb-4" id="mainNav">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'news:news_list' %}">Новостной портал</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'news:news_list' %}">Главная</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'news:about' %}">О нас</a>
+                    </li>
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'news:profile_edit' %}">Профиль</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'account_logout' %}">Выйти</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'account_login' %}">Войти</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'account_signup' %}">Регистрация</a>
+                        </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <button class="btn btn-outline-secondary" id="theme-toggle">Тёмная тема</button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <h1 class="mb-4">Новости в категории "{{ category.name }}"</h1>
+
+    <!-- Кнопка подписки -->
+    <div class="mb-4">
+        {% if user.is_authenticated %}
+            {% if user in category.subscribers.all %}
+                <a href="{% url 'news:subscribe_to_category' category.id %}" class="btn btn-sm btn-danger">Отписаться</a>
+            {% else %}
+                <a href="{% url 'news:subscribe_to_category' category.id %}" class="btn btn-sm btn-success">Подписаться</a>
+            {% endif %}
+        {% else %}
+            <p class="text-muted">Войдите, чтобы подписаться на категорию.</p>
+        {% endif %}
+    </div>
+
+    <div class="row">
+        {% for item in page_obj %}
+        <div class="col-md-6">
+            <div class="card news-card">
+                <div class="card-body">
+                    <h5 class="card-title news-title">
+                        <a href="{% url 'news:news_detail' item.pk %}">{{ item.title|censor }}</a>
+                    </h5>
+                    <p class="card-text news-meta">
+                        {{ item.type|title }} | {{ item.published_date|date:"d.m.Y" }} | {{ item.author|default:"Без автора" }}
+                    </p>
+                    <p class="card-text news-content">{{ item.content|truncatechars:150|censor }}</p>
+                    {% if user.is_authenticated %}
+                        <div class="d-flex gap-2">
+                            <a href="{% url 'news:news_edit' item.pk %}" class="btn btn-sm btn-warning">Редактировать</a>
+                            <a href="{% url 'news:news_delete' item.pk %}" class="btn btn-sm btn-danger">Удалить</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <p class="text-muted">Новостей в этой категории пока нет.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <nav aria-label="Page navigation" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1">« Первая</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Предыдущая</a>
+                </li>
+            {% endif %}
+            <li class="page-item disabled">
+                <span class="page-link">
+                    Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}.
+                </span>
+            </li>
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Следующая</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Последняя »</a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+{% endblock %}

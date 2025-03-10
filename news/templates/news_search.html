@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Поиск новостей</h1>
+<form method="get">
+    {{ filter.form.as_p }}
+    <button type="submit" class="btn btn-primary">Найти</button>
+    <a href="{% url 'news:news_list' %}" class="btn btn-secondary">Назад</a>
+</form>
+<h2>Результаты</h2>
+<ul>
+    {% for news in page_obj %}
+    <li>{{ news.title }} ({{ news.type|title }}) - {{ news.published_date|date:"d.m.Y" }}</li>
+    {% endfor %}
+</ul>
+{% endblock %}

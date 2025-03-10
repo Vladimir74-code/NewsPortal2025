@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load i18n socialaccount %}
+
+{% block content %}
+<h1>{% trans "Вход" %}</h1>
+<form method="post" action="{% url 'account_login' %}">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">{% trans "Войти" %}</button>
+</form>
+
+<h2>{% trans "Или войдите через социальные сети" %}</h2>
+{% get_providers as socialaccount_providers %}
+{% if socialaccount_providers %}
+    {% for provider in socialaccount_providers %}
+        {% if provider.id == "yandex" %}
+            <a href="{% provider_login_url 'yandex' %}" class="btn btn-danger">
+                {% trans "Войти через Yandex" %}
+            </a>
+        {% endif %}
+    {% endfor %}
+{% else %}
+    <p>{% trans "Социальная авторизация не настроена." %}</p>
+{% endif %}
+
+<p>{% trans "Нет аккаунта?" %} <a href="{% url 'account_signup' %}">{% trans "Зарегистрироваться" %}</a></p>
+{% endblock %}
