@@ -4,7 +4,6 @@ Django settings for newsport project.
 
 import os
 from pathlib import Path
-from celery.schedules import crontab
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -139,18 +138,10 @@ CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'  # Redis для хранен�
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TIMEZONE = 'UTC'  #  часовой пояс (можно заменить на 'Europe/Moscow')
+CELERY_TIMEZONE = 'Europe/Moscow'  #  часовой пояс
 CELERY_ENABLE_UTC = True
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60  # 30 минут на выполнение задачи
-
-# Настройки Celery Beat (расписание задач)
-CELERY_BEAT_SCHEDULE = {
-    'send-weekly-digest': {
-        'task': 'news.tasks.send_weekly_digest',
-        'schedule': crontab(hour=0, minute=0, day_of_week='monday'),  # Каждое понедельник в 00:00
-    },
-}
 
 # Отладка для email (временный консольный бэкенд, если SMTP не работает)
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
@@ -158,5 +149,3 @@ CELERY_BEAT_SCHEDULE = {
 # Отладка
 import logging
 logging.basicConfig(level=logging.DEBUG)
-
-

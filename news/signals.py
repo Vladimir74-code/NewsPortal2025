@@ -2,12 +2,13 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.core.mail import send_mail
 from django.urls import reverse
+from django.conf import settings
 from .models import News
 
 @receiver(post_save, sender=News)
 def send_new_article_email(sender, instance, created, **kwargs):
     if created:
-        for category in instance.categories.all():  # Учитываем все категории
+        for category in instance.categories.all():
             subscribers = category.subscribers.all()
             for subscriber in subscribers:
                 subject = f'Новая статья в категории {category.name}'
@@ -16,9 +17,8 @@ def send_new_article_email(sender, instance, created, **kwargs):
                 send_mail(
                     subject,
                     message,
-                    'budkeevvladimir32@yandex.ru',
+                    settings.DEFAULT_FROM_EMAIL,  # Используем значение из settings.py
                     [subscriber.email],
-                    fail_silently=True,
+                    fail_silently=False,  # Логируем ошибки вместо игнорирования
                 )
-
 

@@ -10,6 +10,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.models import Group
 from django.utils import timezone
+from news.tasks import send_news_notification
 
 # Общие представления
 def about(request):
@@ -91,7 +92,6 @@ class NewsCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     success_url = reverse_lazy('news:news_list')
 
     def test_func(self):
-        # Проверка, является ли пользователь автором
         return self.request.user.is_authenticated and hasattr(self.request.user, 'author')
 
     def form_valid(self, form):
@@ -102,7 +102,9 @@ class NewsCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
         if news_count >= 3:
             messages.error(self.request, 'Вы не можете публиковать более 3 новостей в сутки.')
             return redirect('news:news_list')
-        return super().form_valid(form)
+        response = super().form_valid(form)
+        send_news_notification.delay(self.object.id)  # Добавляем вызов задачи Celery
+        return response
 
     def handle_no_permission(self):
         messages.error(self.request, 'Вы не зарегистрированы как автор. Станьте автором перед созданием новости.')

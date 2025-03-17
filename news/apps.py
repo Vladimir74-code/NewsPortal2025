@@ -5,10 +5,6 @@ class NewsConfig(AppConfig):
     name = 'news'
 
     def ready(self):
-        import news.signals
-        from news.tasks import send_weekly_newsletter
-        from apscheduler.schedulers.background import BackgroundScheduler
-        from apscheduler.triggers.cron import CronTrigger
-        scheduler = BackgroundScheduler()
-        scheduler.add_job(send_weekly_newsletter, CronTrigger(day_of_week='mon', hour=9, minute=0))
-        scheduler.start()
+        # Подключаем сигналы и задачи
+        import news.signals  # Подключаем сигналы (если они есть)
+        from news.tasks import send_weekly_digest  # Импортируем задачу с правильным именем
