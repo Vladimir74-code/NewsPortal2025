@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container my-5">
+    <h1>Стать автором</h1>
+    {% if user.is_authenticated %}
+        {% if user_has_author %}
+            <p class="text-success">Вы уже являетесь автором!</p>
+        {% else %}
+            <form method="post" action="{% url 'news:become_author' %}">
+                {% csrf_token %}
+                <p>Вы уверены, что хотите стать автором? Это позволит вам создавать новости и статьи.</p>
+                <button type="submit" class="btn btn-primary">Подтвердить</button>
+            </form>
+        {% endif %}
+    {% else %}
+        <p class="text-danger">Пожалуйста, войдите в систему, чтобы стать автором.</p>
+        <a href="{% url 'account_login' %}" class="btn btn-primary">Войти</a>
+    {% endif %}
+</div>
+{% endblock %}
