@@ -15,7 +15,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
@@ -144,7 +144,6 @@ CELERY_ENABLE_UTC = True
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60  # 30 минут на выполнение задачи
 
-
 # Конфигурация логирования для NewsPortal2025
 # - Консоль: DEBUG+ при DEBUG=True (включает pathname для WARNING+, exc_info для ERROR+)
 # - general.log: INFO+ при DEBUG=False (время, уровень, модуль, сообщение)
@@ -167,17 +166,14 @@ class ConsoleFormatter(logging.Formatter):
 
         return super().format(record)
 
-
 # Кастомные фильтры
 class DebugTrueFilter(logging.Filter):
     def filter(self, record):
         return settings.DEBUG
 
-
 class DebugFalseFilter(logging.Filter):
     def filter(self, record):
         return not settings.DEBUG
-
 
 # Путь к файлам логов (относительно BASE_DIR)
 LOG_DIR = os.path.join(BASE_DIR, 'logs')
@@ -294,3 +290,10 @@ LOGGING = {
         },
     },
 }
+
+# Отладка для email (временный консольный бэкенд, если SMTP не работает)
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# Отладка
+import logging
+logging.basicConfig(level=logging.DEBUG)
